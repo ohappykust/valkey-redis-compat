@@ -48,7 +48,7 @@ jobs:
         run: uv build
 
       - name: Check distributions
-        run: uv pip install --system twine && twine check dist/*
+        run: uvx twine check dist/*
 
       - name: Publish to PyPI
         run: uv publish --trusted-publishing always
