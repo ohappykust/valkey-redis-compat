@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=77.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "valkey-redis-compat"
+version = "0.1.0"
+description = "Drop-in redis-py replacement backed by valkey-py — migrate from Redis to Valkey without changing application code"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.9"
+authors = [
+    { name = "Kirill Nikolaevskiy", email = "me@happykust.dev" },
+]
+keywords = ["redis", "valkey", "compatibility", "shim", "migration"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Database",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "valkey>=6.1.1",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=7.0", "kombu>=5.0", "flask-caching>=2.0"]
+
+[project.urls]
+Homepage = "https://github.com/ohappykust/valkey-redis-compat"
+Repository = "https://github.com/ohappykust/valkey-redis-compat"
+Issues = "https://github.com/ohappykust/valkey-redis-compat/issues"
+
+[tool.setuptools.packages.find]
+include = ["redis*"]
