@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "valkey-redis-compat"
-version = "0.1.0"
+version = "0.1.1"
 description = "Drop-in redis-py replacement backed by valkey-py — migrate from Redis to Valkey without changing application code"
 readme = "README.md"
 license = "MIT"

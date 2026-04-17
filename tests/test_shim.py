@@ -329,6 +329,37 @@ class TestSubmoduleAttributes:
         from redis.asyncio.lock import Lock
         assert isinstance(Lock, type)
 
+    def test_async_client_strict_redis_attr(self):
+        """sentry-sdk dereferences redis.asyncio.client.StrictRedis."""
+        import redis.asyncio
+        assert redis.asyncio.client.StrictRedis is valkey.asyncio.client.Valkey
+
+    def test_async_client_redis_attr(self):
+        import redis.asyncio
+        assert redis.asyncio.client.Redis is valkey.asyncio.client.Valkey
+
+    def test_async_client_pipeline_attr(self):
+        """sentry-sdk dereferences redis.asyncio.client.Pipeline."""
+        import redis.asyncio
+        assert redis.asyncio.client.Pipeline is valkey.asyncio.client.Pipeline
+
+    def test_async_cluster_redis_cluster_attr(self):
+        """sentry-sdk dereferences redis.asyncio.cluster.RedisCluster."""
+        import redis.asyncio
+        assert redis.asyncio.cluster.RedisCluster is valkey.asyncio.cluster.ValkeyCluster
+
+    def test_async_cluster_cluster_pipeline_attr(self):
+        import redis.asyncio
+        assert redis.asyncio.cluster.ClusterPipeline is valkey.asyncio.cluster.ClusterPipeline
+
+    def test_sync_client_strict_redis_attr(self):
+        import redis
+        assert redis.client.StrictRedis is valkey.client.Valkey
+
+    def test_sync_cluster_redis_cluster_attr(self):
+        import redis
+        assert redis.cluster.RedisCluster is valkey.cluster.ValkeyCluster
+
 
 # ===================================================================
 # 4. redis.exceptions — compat aliases
