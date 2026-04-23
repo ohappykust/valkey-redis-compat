@@ -487,6 +487,61 @@ class TestMetadataPatch:
 
 
 # ===================================================================
+# 5b. ConnectionPool.get_connection compatibility with kombu 5.3+
+# ===================================================================
+
+class TestConnectionPoolGetConnection:
+    """kombu 5.3+ calls pool.get_connection() with no args (redis-py 5.3 signature).
+
+    valkey-py keeps command_name as a required positional, so the shim patches
+    ConnectionPool classes to make command_name optional.  Regression guard for
+    the TypeError that crashed Celery workers under valkey-redis-compat 0.1.1.
+    """
+
+    @pytest.mark.parametrize("dotted", [
+        "valkey.connection.ConnectionPool",
+        "valkey.connection.BlockingConnectionPool",
+        "valkey.asyncio.connection.ConnectionPool",
+        "valkey.asyncio.connection.BlockingConnectionPool",
+    ])
+    def test_command_name_is_optional(self, dotted):
+        import redis  # noqa: F401  - activate the patch
+        import importlib
+        import inspect
+
+        parts = dotted.split(".")
+        obj = importlib.import_module(".".join(parts[:-1]))
+        cls = getattr(obj, parts[-1])
+
+        sig = inspect.signature(cls.get_connection)
+        param = sig.parameters["command_name"]
+        assert param.default is not inspect.Parameter.empty, (
+            f"{dotted}.get_connection still requires command_name; "
+            f"kombu 5.3+ would raise TypeError"
+        )
+
+    def test_sync_pool_call_without_args_does_not_raise_type_error(self):
+        """Reproduce the exact kombu 5.3+ call — TypeError would mean the patch failed."""
+        import redis  # noqa: F401
+        from valkey.connection import ConnectionPool
+
+        pool = ConnectionPool(
+            host="127.0.0.1",
+            port=1,  # unreachable — ConnectionError is fine, TypeError is not
+            socket_connect_timeout=0.01,
+        )
+        try:
+            pool.get_connection()
+        except TypeError as e:  # pragma: no cover - regression signal
+            pytest.fail(f"signature still broken: {e}")
+        except Exception:
+            # ConnectionError / OSError / etc. — expected and unrelated to this test.
+            pass
+        finally:
+            pool.disconnect()
+
+
+# ===================================================================
 # 6. Third-party compatibility — kombu
 # ===================================================================
 
